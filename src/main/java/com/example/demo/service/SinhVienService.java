@@ -8,6 +8,7 @@ import com.example.demo.dto.ResponseAddSinhVien;
 import com.example.demo.dto.ResponseDeleteSinhVien;
 import com.example.demo.dto.ResponseGetListSinhVien;
 import com.example.demo.dto.ResponseUpdateSinhVien;
+import com.example.demo.dto.SinhVienDto;
 import com.example.demo.entity.SinhVien;
 import com.example.demo.repository.SinhVienRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,9 @@ public class SinhVienService {
     }
 
     public ResponseAddSinhVien add(RequestAddSinhVien req) {
-        SinhVien sinhVien = req.getSinhVien();
-        sinhVienRepository.save(sinhVien);
+        SinhVienDto sv = req.getSinhVienDto();
+
+        sinhVienRepository.save(SinhVien.builder().name(sv.getName()).yob(sv.getYob()).phoneNumber(sv.getPhoneNumber()).build());
         return new ResponseAddSinhVien();
     }
 

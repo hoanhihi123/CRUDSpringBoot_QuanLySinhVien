@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor @AllArgsConstructor
 public class RequestAddSinhVien extends BaseRequest{
-    private SinhVien sinhVien;
+    private SinhVienDto sinhVienDto;
 }
