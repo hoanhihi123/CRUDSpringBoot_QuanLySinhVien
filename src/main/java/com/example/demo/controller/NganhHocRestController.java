@@ -15,7 +15,7 @@ public class NganhHocRestController {
     NganhHocService nganhHocService;
 
     // Lấy tất cả ngành học
-    @GetMapping
+    @GetMapping("/getall")
     public ResponseEntity<List<NganhHoc>> getAllNganhHoc() {
         List<NganhHoc> nganhHocList = nganhHocService.getAllNganhHoc();
         if (!nganhHocList.isEmpty()) {
@@ -26,7 +26,7 @@ public class NganhHocRestController {
     }
 
     // Tạo / Sửa ngành học
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<NganhHoc> saveNganhHoc(@RequestBody NganhHoc nganhHoc) {
         NganhHoc savedNganhHoc = nganhHocService.saveNganhHoc(nganhHoc);
         if (savedNganhHoc != null) {
@@ -37,7 +37,7 @@ public class NganhHocRestController {
     }
 
     // Xóa ngành học theo ID
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteNganhHocById(@PathVariable Integer id) {
         boolean deleted = nganhHocService.deleteNganhHocById(id);
         if (deleted) {
