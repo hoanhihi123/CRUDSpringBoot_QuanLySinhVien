@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.model.NganhHoc;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

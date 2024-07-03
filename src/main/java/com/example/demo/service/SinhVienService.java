@@ -1,52 +1,48 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.RequestAddSinhVien;
-import com.example.demo.dto.RequestDeleteSinhVien;
-import com.example.demo.dto.RequestGetListSinhVien;
-import com.example.demo.dto.RequestUpdateSinhVien;
-import com.example.demo.dto.ResponseAddSinhVien;
-import com.example.demo.dto.ResponseDeleteSinhVien;
-import com.example.demo.dto.ResponseGetListSinhVien;
-import com.example.demo.dto.ResponseUpdateSinhVien;
-import com.example.demo.dto.SinhVienDto;
+import com.example.demo.entity.NganhHocDto;
 import com.example.demo.entity.SinhVien;
-import com.example.demo.repository.SinhVienRepository;
+import com.example.demo.model.NganhHoc;
+import com.example.demo.repository.ISinhVienRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SinhVienService {
     @Autowired
-    private SinhVienRepository sinhVienRepository;
-    public ResponseGetListSinhVien getList(RequestGetListSinhVien req) {
-        List<SinhVien> list = sinhVienRepository.findAll();
-        ResponseGetListSinhVien res = new ResponseGetListSinhVien();
-        res.setListSinhVien(list);
-        return res;
+    private ISinhVienRepository iSinhVienRepository;
+    @Autowired
+    private NganhHocService nganhHocService;
+
+    public List<SinhVien> getListSinhVien() {
+        return iSinhVienRepository.findAll();
     }
 
-    public ResponseAddSinhVien add(RequestAddSinhVien req) {
-        SinhVienDto sv = req.getSinhVienDto();
-
-        sinhVienRepository.save(SinhVien.builder().name(sv.getName()).yob(sv.getYob()).phoneNumber(sv.getPhoneNumber()).build());
-        return new ResponseAddSinhVien();
+    public List<SinhVien> getListSinhVienByNameContaining(String name) {
+        return iSinhVienRepository.findAllByNameContaining(name);
     }
 
-    public ResponseDeleteSinhVien delete(RequestDeleteSinhVien req) {
-        sinhVienRepository.deleteById(req.getIdSinhVien());
-        return new ResponseDeleteSinhVien();
+    public Optional<SinhVien> getSinhVienById(UUID id) {
+        return iSinhVienRepository.findById(id);
     }
 
-    public ResponseUpdateSinhVien update(RequestUpdateSinhVien req) {
-//        Optional<SinhVien> o = sinhVienRepository.findById(req.getIdSinhVien());
-//        if(o.isPresent()){
-//
-//        }else {
-//
-//        }
-        return new ResponseUpdateSinhVien();
+    public SinhVien createSinhVien(SinhVien sinhVien) {
+        return iSinhVienRepository.save(SinhVien.builder().name(sinhVien.getName()).yob(sinhVien.getYob()).phoneNumber(sinhVien.getPhoneNumber()).nganhHoc(sinhVien.getNganhHoc()).build());
+    }
+
+    public SinhVien updateSinhVien(SinhVien sv) {
+        return iSinhVienRepository.save(sv);
+    }
+
+    public void deleteSinhVienById(UUID id) {
+        iSinhVienRepository.deleteById(id);
+    }
+
+    public List<NganhHocDto> thongKe() {
+        return iSinhVienRepository.thongKe();
     }
 }
