@@ -3,58 +3,117 @@ package com.example.demo.service;
 import com.example.demo.model.NganhHoc;
 import com.example.demo.repository.INganhHocRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class NganhHocService {
     @Autowired
-    INganhHocRepository repo_nganhHoc;
+    private final INganhHocRepository repo_nganhHoc;
 
-    private static final Logger logger = LoggerFactory.getLogger(NganhHocService.class);
+    public NganhHocService(INganhHocRepository repo_nganhHoc){
+        this.repo_nganhHoc = repo_nganhHoc;
+    }
 
 
     // lấy tất cả ngành học
     public List<NganhHoc> getAllNganhHoc(){
-        return repo_nganhHoc.findAll();
+        try{
+            return repo_nganhHoc.findAll();
+        }catch (Exception ex){
+            throw new RuntimeException("Failed to get all Nganh Hoc! \nCause is: " + ex.getMessage());
+        }
+    }
+
+    // lấy danh sách ngành học và phân trang
+    public Page<NganhHoc> getAllNganhHoc(Pageable pageable) {
+        try {
+            return repo_nganhHoc.getNganhHocTheoPage(pageable);
+        } catch (DataAccessException ex) { // Specific exception for data access errors
+            throw new RuntimeException("Failed to get all Nganh Hoc! Cause is: " + ex.getMessage(), ex);
+        }
     }
 
     // lấy ngành học theo id
     public Optional<NganhHoc> getNganhHocById(Integer id) {
-        if (id == null) {
-            logger.error("Id truyền vào để thực hiện lấy chi tiết ngành học null!");
-            return Optional.empty();
+        try{
+            return repo_nganhHoc.findById(id);
+        }catch (Exception ex){
+            throw new RuntimeException("Failed to get detail Nganh Hoc by Id! \nCause is: " + ex.getMessage());
         }
-
-        return repo_nganhHoc.findById(id);
     }
 
-    // Tạo / Sửa ngành học
-    public NganhHoc saveNganhHoc(NganhHoc nganhHoc) {
-        if (nganhHoc == null) {
-            logger.error("Object nganhHoc truyền vào để thực hiện tạo/sửa ngành học null");
-            return null;
+    // tạo mới ngành học
+    public NganhHoc createNganhHoc(NganhHoc nganhHoc){
+        try{
+            NganhHoc nganhHocNew = new NganhHoc();
+            nganhHocNew.setMaNganh(nganhHoc.getMaNganh());
+            nganhHocNew.setTenNganh(nganhHoc.getTenNganh());
+            nganhHocNew.setIsDeleted(nganhHoc.getIsDeleted()!=null?nganhHoc.getIsDeleted():true);
+
+            return repo_nganhHoc.save(nganhHocNew);
+        }catch (Exception ex){
+            throw new RuntimeException("Failed to create Nganh Hoc! \nCause is: " + ex.getMessage() );
         }
-        return repo_nganhHoc.save(nganhHoc);
+    }
+
+    // sửa thông tin ngành học theo id
+    public Optional<NganhHoc> updateNganhHoc(Integer id, NganhHoc nganhHoc) {
+        try {
+            // Tìm kiếm đối tượng NganhHoc có id tương ứng
+            Optional<NganhHoc> existingNganhHoc = repo_nganhHoc.findById(id);
+            if (existingNganhHoc.isPresent()) {
+                // Cập nhật thông tin NganhHoc
+                NganhHoc nganhHocUpdate = existingNganhHoc.get();
+                nganhHocUpdate.setId(id);
+                nganhHocUpdate.setMaNganh(nganhHoc.getMaNganh());
+                nganhHocUpdate.setTenNganh(nganhHoc.getTenNganh());
+                if(nganhHoc.getIsDeleted()!=null){
+                    nganhHocUpdate.setIsDeleted(nganhHoc.getIsDeleted());
+                }
+
+                // Lưu lại đối tượng NganhHoc đã được cập nhật
+                NganhHoc nganhHocUpdated = repo_nganhHoc.save(nganhHocUpdate);
+                return Optional.of(nganhHocUpdated);
+            } else {
+                return Optional.empty();
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to update Nganh Hoc! \nCause is: " + ex.getMessage());
+        }
     }
 
     // Xóa ngành học theo ID
     public boolean deleteNganhHocById(Integer id) {
-        if (id == null) {
-            logger.error("Id truyền vào để thực hiện xóa ngành học null!");
-            return false;
-        }
-        if (repo_nganhHoc.existsById(id)) {
+        try{
             repo_nganhHoc.deleteById(id);
             return true;
-        } else {
-            logger.warn("Không tìm thấy ngành học với ID: {}", id);
-            return false;
+        }catch (Exception ex){
+            throw new RuntimeException("Failed to delete Nganh Hoc! \nCause is: " + ex.getMessage());
         }
     }
 
+    // kiểm tra mã ngành học đã có trong database hay chưa ?
+    // dùng procedure
+    public int checkExistMaNganhHoc(String maNganhHoc){
+        return repo_nganhHoc.checkMaNganhExists(maNganhHoc);
+    }
+
+    // xóa mềm ngành học
+    public boolean xoaMemNganhHocById(Integer id) {
+        try{
+            repo_nganhHoc.xoaMemNganhHocById(id);
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException("Failed to xóa mềm Nganh Hoc! \nCause is: " + ex.getMessage());
+        }
+    }
 
 }
