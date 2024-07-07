@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.entity.NganhHocDto;
 import com.example.demo.entity.SinhVien;
 import com.example.demo.model.NganhHoc;
+import com.example.demo.repository.IProcedureRepository;
 import com.example.demo.repository.ISinhVienRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,8 @@ public class SinhVienService {
     private ISinhVienRepository iSinhVienRepository;
     @Autowired
     private NganhHocService nganhHocService;
-
+    @Autowired
+    private IProcedureRepository iProcedureRepository;
     public List<SinhVien> getListSinhVien() {
         return iSinhVienRepository.findAll();
     }
@@ -43,6 +45,6 @@ public class SinhVienService {
     }
 
     public List<NganhHocDto> thongKe() {
-        return iSinhVienRepository.thongKe();
+        return iProcedureRepository.thongKe();
     }
 }

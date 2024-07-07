@@ -91,6 +91,7 @@ public class SinhVienController {
             List<NganhHocDto> list = sinhVienService.thongKe();
             return new ResponseEntity<>(list,HttpStatus.OK);
         }catch (Exception e){
+            e.printStackTrace();
             return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

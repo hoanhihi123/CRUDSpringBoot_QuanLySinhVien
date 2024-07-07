@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="NganhHoc")
+@Table(name="nganh_hoc")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,11 +17,11 @@ public class NganhHoc {
     @Column(name="id")
     private int id;
 
-    @Column(name = "maNganhHoc")
+    @Column(name = "ma_nganh_hoc")
     private String maNganh;
 
 
-    @Column(name = "tenNganhHoc")
+    @Column(name = "ten_nganh_hoc")
     private String tenNganh;
 
 }
