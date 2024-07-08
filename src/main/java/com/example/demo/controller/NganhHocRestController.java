@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.exceptioncustom.NotFoundRecordExistInDatabaseException;
 import com.example.demo.model.NganhHoc;
+import com.example.demo.service.NganhHocProcedureService;
 import com.example.demo.service.NganhHocService;
 import com.example.demo.exceptioncustom.DuplicateCodeException;
 import com.example.demo.service.SinhVienService;
@@ -28,6 +29,9 @@ public class NganhHocRestController {
     @Autowired
     SinhVienService sinhVienService;
 
+    @Autowired
+    NganhHocProcedureService nganhHocProcedureService;
+
     // tạo 1 ngành học
     @PostMapping("/create")
     public ResponseEntity<?> createNganhHoc(@Valid @RequestBody NganhHoc nganhHoc)
@@ -50,7 +54,7 @@ public class NganhHocRestController {
         }catch (DuplicateCodeException ex){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi tạo ngành học.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi TẠO ngành học!\nNguyên nhân do:"+ex.getMessage());
         }
     }
 
@@ -60,8 +64,7 @@ public class NganhHocRestController {
             @RequestParam(name = "page", defaultValue = "0") int currentPage
     ){
         Pageable pageable = PageRequest.of(currentPage, Constant.numberPage);
-        Page<NganhHoc> pageNganhHoc = nganhHocService.getAllNganhHoc(pageable);
-        List<NganhHoc> listNganhHoc = pageNganhHoc.getContent();
+        List<NganhHoc> listNganhHoc = nganhHocService.getAllNganhHoc(pageable).getContent();
 
         try{
             if(listNganhHoc.size()==0){
@@ -71,15 +74,17 @@ public class NganhHocRestController {
             return ResponseEntity.ok(listNganhHoc);
 
         }catch (NullPointerException exception){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Danh sách ngành học null!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Danh sách ngành học null!");
         }catch (Exception exception){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình lấy danh sách ngành học!");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình XEM danh sách ngành học!\nNguyên nhân do:"+exception.getMessage());
         }
     }
 
     // Xóa ngành học theo ID
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteNganhHocById(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteNganhHocById(
+            @PathVariable Integer id
+    ) {
         try{
             if(id==null){
                 throw new NullPointerException("Giá trị id truyền từ URL is null!");
@@ -144,11 +149,11 @@ public class NganhHocRestController {
         }catch (DuplicateCodeException ex){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi sửa ngành học.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi SỬA ngành học!\nNguyên nhân do:"+ex.getMessage());
         }
     }
 
-    // lấy chi tiết sản phẩm theo id
+    // lấy chi tiết ngành học theo id
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> getDetailById(
             @PathVariable Integer id
@@ -169,7 +174,27 @@ public class NganhHocRestController {
         }catch (NullPointerException ex){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi sửa ngành học.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi XEM CHI TIẾT ngành học!\nNguyên nhân do:"+ex.getMessage());
         }
     }
+
+    // lấy danh sách ngành học sử dụng procedure
+    @GetMapping("/getList")
+    public ResponseEntity<?> getAllDanhSachNganhHoc(){
+        List<NganhHoc> listNganhHoc = nganhHocProcedureService.layDanhSachNganhHoc();
+
+        try{
+            if(listNganhHoc.size()==0){
+                return ResponseEntity.ok("Không có bản ghi nào trong Database!");
+            }
+
+            return ResponseEntity.ok(listNganhHoc);
+
+        }catch (NullPointerException exception){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Danh sách ngành học null!");
+        }catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình XEM danh sách ngành học!\nNguyên nhân do:"+exception.getMessage());
+        }
+    }
+
 }

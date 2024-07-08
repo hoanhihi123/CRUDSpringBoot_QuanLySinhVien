@@ -14,6 +14,4 @@ public interface ISinhVienRepository extends JpaRepository<SinhVien, UUID> {
     @Query("SELECT COUNT(sv) FROM SinhVien sv WHERE sv.nganhHoc.id = :idNganhHoc")
     public int checkExistsNganhHocInTableSinhVien(@Param("idNganhHoc") Integer idNganhHoc);
 
-
-
 }

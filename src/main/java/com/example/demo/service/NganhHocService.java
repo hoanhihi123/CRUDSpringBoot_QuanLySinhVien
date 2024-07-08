@@ -7,8 +7,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,24 +65,18 @@ public class NganhHocService {
     // sửa thông tin ngành học theo id
     public Optional<NganhHoc> updateNganhHoc(Integer id, NganhHoc nganhHoc) {
         try {
-            // Tìm kiếm đối tượng NganhHoc có id tương ứng
-            Optional<NganhHoc> existingNganhHoc = repo_nganhHoc.findById(id);
-            if (existingNganhHoc.isPresent()) {
-                // Cập nhật thông tin NganhHoc
-                NganhHoc nganhHocUpdate = existingNganhHoc.get();
-                nganhHocUpdate.setId(id);
-                nganhHocUpdate.setMaNganh(nganhHoc.getMaNganh());
-                nganhHocUpdate.setTenNganh(nganhHoc.getTenNganh());
-                if(nganhHoc.getIsDeleted()!=null){
-                    nganhHocUpdate.setIsDeleted(nganhHoc.getIsDeleted());
-                }
-
-                // Lưu lại đối tượng NganhHoc đã được cập nhật
-                NganhHoc nganhHocUpdated = repo_nganhHoc.save(nganhHocUpdate);
-                return Optional.of(nganhHocUpdated);
-            } else {
-                return Optional.empty();
+            NganhHoc nganhHocUpdate = new NganhHoc();
+            nganhHocUpdate.setId(id);
+            nganhHocUpdate.setMaNganh(nganhHoc.getMaNganh());
+            nganhHocUpdate.setTenNganh(nganhHoc.getTenNganh());
+            if(nganhHoc.getIsDeleted()!=null){
+                nganhHocUpdate.setIsDeleted(nganhHoc.getIsDeleted());
             }
+
+            NganhHoc nganhHocUpdated = repo_nganhHoc.save(nganhHocUpdate);
+
+            return Optional.of(nganhHocUpdated);
+
         } catch (Exception ex) {
             throw new RuntimeException("Failed to update Nganh Hoc! \nCause is: " + ex.getMessage());
         }
@@ -103,7 +95,11 @@ public class NganhHocService {
     // kiểm tra mã ngành học đã có trong database hay chưa ?
     // dùng procedure
     public int checkExistMaNganhHoc(String maNganhHoc){
-        return repo_nganhHoc.checkMaNganhExists(maNganhHoc);
+        try{
+            return repo_nganhHoc.checkMaNganhExists(maNganhHoc);
+        }catch (Exception ex){
+            throw new RuntimeException("Failed to check ma nganh có tồn tại không! \nCause is: " + ex.getMessage());
+        }
     }
 
     // xóa mềm ngành học

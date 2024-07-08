@@ -28,28 +28,32 @@ public interface INganhHocRepository extends JpaRepository<NganhHoc, Integer> {
             countQuery = "select count(*) from NganhHoc", nativeQuery = true)
     public Page<NganhHoc> getNganhHocTheoPage(Pageable pageable);
 
+
+
+
     // hàm thực hiện lấy danh sách sinh viên bằng procedure
-    @Procedure(name = "sp_layDanhSachNganhHoc")
+    @Query(value = "EXEC sp_layDanhSachNganhHoc", nativeQuery = true)
     public List<NganhHoc> layDanhSachNganhHoc();
 
-    @Procedure(name = "sp_updateNganhHoc")
-    void updateNganhHoc(
-            @Param("maNganh") String maNganh,
-            @Param("tenNganh") String tenNganh,
-            @Param("isDeleted") Boolean isDeleted,
-            @Param("idNganhHoc") Integer idNganhHocUpdate
-    );
 
-    @Procedure(name = "sp_insertNganhHoc")
-    void taoNganhHoc(
-            @Param("maNganh") String maNganh,
-            @Param("tenNganh") String tenNganh
-    );
-
-    @Procedure(name = "sp_xoaNganhHoc")
-    void xoaNganhHoc(
-            @Param("idNganhHoc") int idNganhHocDeleted
-    );
+//    @Procedure(name = "sp_updateNganhHoc")
+//    void updateNganhHoc(
+//            @Param("maNganh") String maNganh,
+//            @Param("tenNganh") String tenNganh,
+//            @Param("isDeleted") Boolean isDeleted,
+//            @Param("idNganhHoc") Integer idNganhHocUpdate
+//    );
+//
+//    @Procedure(name = "sp_insertNganhHoc")
+//    void taoNganhHoc(
+//            @Param("maNganh") String maNganh,
+//            @Param("tenNganh") String tenNganh
+//    );
+//
+//    @Procedure(name = "sp_xoaNganhHoc")
+//    void xoaNganhHoc(
+//            @Param("idNganhHoc") int idNganhHocDeleted
+//    );
 
 
 }
