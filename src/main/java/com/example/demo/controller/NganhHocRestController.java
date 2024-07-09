@@ -2,7 +2,11 @@ package com.example.demo.controller;
 
 import com.example.demo.exceptioncustom.DuplicateValueException;
 import com.example.demo.exceptioncustom.NotFoundRecordExistInDatabaseException;
+<<<<<<< HEAD
 import com.example.demo.model.NganhHoc;
+=======
+import com.example.demo.entity.NganhHoc;
+>>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531
 import com.example.demo.service.NganhHocProcedureService;
 import com.example.demo.service.NganhHocService;
 import com.example.demo.service.SinhVienService;
@@ -263,4 +267,8 @@ public class NganhHocRestController {
         }
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531
