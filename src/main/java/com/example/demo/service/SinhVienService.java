@@ -1,9 +1,11 @@
 package com.example.demo.service;
 
 
-import com.example.demo.entity.NganhHocDto;
+import com.example.demo.entity.NganhHoc;
+import com.example.demo.entity.dto.NganhHocDto;
 import com.example.demo.entity.SinhVien;
-import com.example.demo.model.NganhHoc;
+import com.example.demo.entity.dto.SinhvienDto;
+import com.example.demo.repository.INganhHocRepository;
 import com.example.demo.repository.IProcedureRepository;
 
 import com.example.demo.repository.ISinhVienRepository;
@@ -25,7 +27,8 @@ public class SinhVienService {
     private ISinhVienRepository iSinhVienRepository;
     @Autowired
     private IProcedureRepository iProcedureRepository;
-
+    @Autowired
+    private INganhHocRepository iNganhHocRepository;
     /**
      * function lấy danh sách sinh viên
      * @return danh sách sinh viên
@@ -57,8 +60,15 @@ public class SinhVienService {
      * @param sinhVien đối tượng sinh viên tạo mới
      * @return đối tượng sinh viên được tạo trong db
      */
-    public SinhVien createSinhVien(SinhVien sinhVien) {
-        return iSinhVienRepository.save(SinhVien.builder().name(sinhVien.getName()).yob(sinhVien.getYob()).phoneNumber(sinhVien.getPhoneNumber()).nganhHoc(sinhVien.getNganhHoc()).build());
+    public SinhVien createSinhVien(SinhvienDto sinhVien) {
+        Optional<NganhHoc> o = iNganhHocRepository.findById(sinhVien.getIdNganhHoc());
+        NganhHoc nganhHoc ;
+        if(o.isPresent()){
+            nganhHoc = o.get();
+        }else {
+            throw new NullPointerException("ko tồn tại ngành học này");
+        }
+        return iSinhVienRepository.save(SinhVien.builder().nganhHoc(nganhHoc).name(sinhVien.getName()).yob(sinhVien.getYob()).phoneNumber(sinhVien.getPhoneNumber()).build());
     }
 
     /**
@@ -86,11 +96,14 @@ public class SinhVienService {
         return iProcedureRepository.thongKe();
     }
 
-    /**
-     * @author hoan
-     * @param idNganhHoc
-     * @return
-     */
+    //
+    /*
+     * Mục đích: đếm số lượng id ngành học có trong bảng sinh viên
+     * Input   : tham số id ngành học
+     * Output  : tổng số lượng id ngành học đếm được trong bảng sinh viên
+     *
+     * */
     public int checkExistIdNganhHocIntableSinhVien(Integer idNganhHoc){
         return iSinhVienRepository.checkExistsNganhHocInTableSinhVien(idNganhHoc);
-    }}
+    }
+}
