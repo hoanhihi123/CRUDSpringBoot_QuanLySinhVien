@@ -8,6 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author hai
+ * entity đối tượng dùng để thống kê số lượng sinh viên của ngành học
+ */
 @Data
 @AllArgsConstructor @NoArgsConstructor
 @Entity

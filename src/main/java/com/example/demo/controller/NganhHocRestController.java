@@ -28,6 +28,9 @@ public class NganhHocRestController {
     @Autowired
     SinhVienService sinhVienService;
 
+    //mục đích : tạo ngành học trong database
+    //đầu vào : Object NganhHoc
+    // trả về : Object NganhHoc vừa tạo thành công
     // tạo 1 ngành học
     @PostMapping("/create")
     public ResponseEntity<?> createNganhHoc(@Valid @RequestBody NganhHoc nganhHoc)
@@ -55,6 +58,9 @@ public class NganhHocRestController {
     }
 
     // Lấy tất cả ngành học
+    //mục đích : lấy danh sách tất cả ngành học
+    //đầu vào : giá trị mặc định = 0, truyền tham số currentPage: số trang hiển thị
+    // trả về : danh sách ngành học theo số trang currentPage truyền vào
     @GetMapping("/getall")
     public ResponseEntity<?> getListNganhHoc(
             @RequestParam(name = "page", defaultValue = "0") int currentPage
@@ -78,6 +84,9 @@ public class NganhHocRestController {
     }
 
     // Xóa ngành học theo ID
+    //mục đích : xoá ngành học bằng id
+    //đầu vào : id của ngành học muốn xoá
+    // trả về : thông báo "Xóa Ngành Học thành công khỏi database!"
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteNganhHocById(@PathVariable Integer id) {
         try{
@@ -109,6 +118,9 @@ public class NganhHocRestController {
     }
 
     // cập nhật ngành học theo id
+    //mục đích : cập nhật ngành học theo id
+    //đầu vào : id của ngành học muốn cập nhật
+    // trả về : Object ngành học vừa cập nhật
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateNganhHoc(
             @PathVariable Integer id,
@@ -148,7 +160,10 @@ public class NganhHocRestController {
         }
     }
 
-    // lấy chi tiết sản phẩm theo id
+    // lấy chi tiết ngành học theo id
+    //mục đích : lấy chi tiết ngành học theo id
+    //đầu vào : id của ngành học muốn xem chi tiết
+    // trả về : Object ngành học muốn xem chi tiết
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> getDetailById(
             @PathVariable Integer id

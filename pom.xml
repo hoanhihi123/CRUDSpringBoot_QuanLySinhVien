@@ -43,11 +43,8 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
-<<<<<<< HEAD
 			<version>9.4.0.jre11</version> <!-- Replace with the latest version -->
-=======
 			<scope>runtime</scope>
->>>>>>> master
 		</dependency>
 
 		<dependency>
@@ -67,7 +64,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -75,6 +76,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<show>protected</show> <!-- Include protected members in generated Javadoc -->
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

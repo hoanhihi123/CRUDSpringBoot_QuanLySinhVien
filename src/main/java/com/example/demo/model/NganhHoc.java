@@ -8,6 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/*
+* Người tạo: Hoan
+* Mục đích class: Mapping Class NganhHoc với Table NganhHoc trong database
+* */
 @Entity
 @Table(name="nganh_hoc")
 @Data
