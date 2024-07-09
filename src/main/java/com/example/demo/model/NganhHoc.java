@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+/*
+ * Người tạo class: Hoan
+ * Mục đích class : Mapping thuộc tính của NganhHoc với Table NganhHoc trong database
+ *
+ * */
 @Entity
 @Table(name="NganhHoc")
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class NganhHoc {
@@ -35,4 +38,43 @@ public class NganhHoc {
     @Column(name = "isdeleted")
     private Boolean isDeleted;
 
+    /*
+     * Mục đích: set lại giá trị cho trường id
+     * Input   : tham số id của ngành học
+     * Output  : không có
+     *
+    * */
+    private void setId(int id) {
+        this.id = id;
+    }
+
+    /*
+     * Mục đích: set lại giá trị cho trường isDeleted
+     * Input   : tham số deleted của ngành học
+     * Output  : không có
+     *
+     * */
+    public void setIsDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    /*
+     * Mục đích: set lại giá trị cho trường maNganh
+     * Input   : tham số maNganh của ngành học
+     * Output  : không có
+     *
+     * */
+    public void setMaNganh(String maNganh) {
+        this.maNganh = maNganh;
+    }
+
+    /*
+     * Mục đích: set lại giá trị cho trường tenNganh
+     * Input   : tham số tenNganh của ngành học
+     * Output  : không có
+     *
+     * */
+    public void setTenNganh(String tenNganh) {
+        this.tenNganh = tenNganh;
+    }
 }
