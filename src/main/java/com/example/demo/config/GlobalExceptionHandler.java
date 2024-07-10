@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author hai and hoan
@@ -58,18 +59,24 @@ public class GlobalExceptionHandler {
      * */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseObject> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+        Optional<FieldError> firstError = ex.getBindingResult().getFieldErrors().stream().findFirst();
 
-        logger.error("Exception occurred: {}, Request Details: {}",ex.getMessage(), ex);
+        Map<String, String> errors = new HashMap<>();
+        if (firstError.isPresent()) {
+            FieldError error = firstError.get();
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+
+        // Log lỗi
+        logger.error("Exception occurred: {}, Request Details: {}", ex.getMessage(), ex);
+
+        // Tạo và trả về đối tượng phản hồi
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            ResponseObject.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .object(errors).build());
+                ResponseObject.builder()
+                        .message(String.valueOf(errors))
+                        .status(HttpStatus.BAD_REQUEST)
+                        .build()
+        );
     }
 
 
@@ -116,9 +123,9 @@ public class GlobalExceptionHandler {
     // for check exist in DB
     @ExceptionHandler(NotFoundRecordExistInDatabaseException.class)
     public ResponseEntity<ResponseObject> handleNotRecordExistInDatabaseException(NotFoundRecordExistInDatabaseException ex){
-       return  ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+       return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ResponseObject.builder()
-                        .status(HttpStatus.NO_CONTENT)
+                        .status(HttpStatus.NOT_FOUND)
                         .build());
     }
 }

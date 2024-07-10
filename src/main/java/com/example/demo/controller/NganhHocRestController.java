@@ -62,31 +62,31 @@ public class NganhHocRestController {
             @Valid @RequestBody NganhHocRequestDTO nganhHocRequest
     )
     {
-            if(nganhHocRequest==null){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        ResponseObject.builder()
-                                .message("Object ngành học chứa giá trị null không hợp lệ!")
-                                .status(HttpStatus.BAD_REQUEST)
-                                .build());
-            }
-
-            if(nganhHocService.demSoLuongNganhHoc_theoMaNganhHoc(nganhHocRequest.getMaNganh())>0){
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                        ResponseObject.builder()
-                                .message("Mã ngành học bị trùng lặp! \nVui lòng nhập mã ngành học khác!")
-                                .status(HttpStatus.CONFLICT)
-                                .object(null)
-                                .build());
-            }
-
-            NganhHoc newNganhHoc = nganhHocService.taoMoiNganhHoc(nganhHocRequest);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(
+        if(nganhHocRequest==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ResponseObject.builder()
-                            .message("Tạo ngành học mới thành công")
-                            .status(HttpStatus.CREATED)
-                            .object(newNganhHoc).build()
-            );
+                            .message("Object ngành học chứa giá trị null không hợp lệ!")
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build());
+        }
+
+        if(nganhHocService.demSoLuongNganhHoc_theoMaNganhHoc(nganhHocRequest.getMaNganh())>0){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    ResponseObject.builder()
+                            .message("Mã ngành học bị trùng lặp! \nVui lòng nhập mã ngành học khác!")
+                            .status(HttpStatus.CONFLICT)
+                            .object(null)
+                            .build());
+        }
+
+        NganhHoc newNganhHoc = nganhHocService.taoMoiNganhHoc(nganhHocRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseObject.builder()
+                        .message("Tạo ngành học mới thành công")
+                        .status(HttpStatus.CREATED)
+                        .object(newNganhHoc).build()
+        );
     }
 
     /*
@@ -139,7 +139,7 @@ public class NganhHocRestController {
             , tags = {"Ngành Học"}
             , responses = {
             @ApiResponse(responseCode = "200", description = "OK - lấy dữ liệu thành công hoặc không có dữ liệu để trả về"),
-            @ApiResponse(responseCode = "204", description = "NO_CONTENT - không có dữ liệu phù hợp để trả về từ Server"),
+            @ApiResponse(responseCode = "404", description = "NOT_FOUND - tài liệu không tồn tại "),
             @ApiResponse(responseCode = "400", description = "BAD_REQUEST - Yêu cầu HTTP không có nội dung hoặc dữ liệu chưa " +
                     "                                           phù hợp với quy định validate"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
@@ -167,10 +167,10 @@ public class NganhHocRestController {
         } else {
             Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
             if (!nganhHocOptional.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                         ResponseObject.builder()
                                 .message("Xóa Ngành Học thành công khỏi database!")
-                                .status(HttpStatus.NO_CONTENT)
+                                .status(HttpStatus.NOT_FOUND)
                                 .build());
             }
 
@@ -195,7 +195,7 @@ public class NganhHocRestController {
             , tags = {"Ngành Học"}
             , responses = {
             @ApiResponse(responseCode = "200", description = "OK - Cập nhật dữ liệu thành công"),
-            @ApiResponse(responseCode = "204", description = "NO_CONTENT - Không có dữ liệu trả về từ Server"),
+            @ApiResponse(responseCode = "404", description = "NOT_FOUND - tài liệu không tồn tại"),
             @ApiResponse(responseCode = "400", description = "BAD_REQUEST - Yêu cầu HTTP không có nội dung hoặc dữ liệu chưa phù hợp với quy định validate"),
             @ApiResponse(responseCode = "409", description = "CONFLICT - Dữ liệu chuyển từ JSON sang Java không hợp lệ hoặc Dữ liệu trùng lặp"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
@@ -265,7 +265,7 @@ public class NganhHocRestController {
             , tags = {"Ngành Học"}
             , responses = {
             @ApiResponse(responseCode = "200", description = "OK - Xem chi tiết ngành học theo id truyền vào thành công"),
-            @ApiResponse(responseCode = "204", description = "NO_CONTENT - Không có dữ liệu trả về từ Server"),
+            @ApiResponse(responseCode = "404", description = "NO_CONTENT - tài liệu không tồn tại"),
             @ApiResponse(responseCode = "400", description = "BAD_REQUEST - Yêu cầu HTTP không có nội dung hoặc dữ liệu chưa phù hợp với quy định validate"),
             @ApiResponse(responseCode = "409", description = "CONFLICT - Dữ liệu chuyển từ JSON sang Java không hợp lệ hoặc Dữ liệu trùng lặp"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
@@ -285,10 +285,10 @@ public class NganhHocRestController {
         // check ngành học có tồn tại bản ghi ko?
         Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
         if(nganhHocOptional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     ResponseObject.builder()
                             .message("Không có bản ghi nào tương ứng với id = " + id + "!")
-                            .status(HttpStatus.NO_CONTENT)
+                            .status(HttpStatus.NOT_FOUND)
                             .build());
         }
 
