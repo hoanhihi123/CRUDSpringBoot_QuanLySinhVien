@@ -2,9 +2,9 @@ package com.example.demo.service;
 
 
 import com.example.demo.entity.NganhHoc;
-import com.example.demo.entity.dto.NganhHocDto;
+import com.example.demo.dto.response.NganhHocDto;
 import com.example.demo.entity.SinhVien;
-import com.example.demo.entity.dto.SinhvienDto;
+import com.example.demo.dto.request.SinhvienDTO;
 import com.example.demo.repository.INganhHocRepository;
 import com.example.demo.repository.IProcedureRepository;
 
@@ -60,8 +60,8 @@ public class SinhVienService {
      * @param sinhVien đối tượng sinh viên tạo mới
      * @return đối tượng sinh viên được tạo trong db
      */
-    public SinhVien createSinhVien(SinhvienDto sinhVien) {
-        Optional<NganhHoc> o = iNganhHocRepository.findById(sinhVien.getIdNganhHoc());
+    public SinhVien createSinhVien(SinhvienDTO sinhVien) {
+        Optional<NganhHoc> o = iNganhHocRepository.findById(sinhVien.getNganhHoc().getId());
         NganhHoc nganhHoc ;
         if(o.isPresent()){
             nganhHoc = o.get();

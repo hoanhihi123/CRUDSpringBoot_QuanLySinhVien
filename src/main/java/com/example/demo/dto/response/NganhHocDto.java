@@ -1,9 +1,8 @@
-package com.example.demo.entity.dto;
+package com.example.demo.dto.response;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.NamedStoredProcedureQuery;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

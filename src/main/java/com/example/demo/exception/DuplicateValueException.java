@@ -1,4 +1,4 @@
-package com.example.demo.exceptioncustom;
+package com.example.demo.exception;
 
 /*
  * Người tạo : Hoan
@@ -9,5 +9,4 @@ public class DuplicateValueException extends RuntimeException{
     public DuplicateValueException(String message){
         super(message);
     }
-
 }

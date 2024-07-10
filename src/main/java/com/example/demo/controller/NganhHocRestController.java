@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.exceptioncustom.DuplicateValueException;
-import com.example.demo.exceptioncustom.NotFoundRecordExistInDatabaseException;
+import com.example.demo.exception.DuplicateValueException;
+import com.example.demo.exception.NotFoundRecordExistInDatabaseException;
 import com.example.demo.entity.NganhHoc;
 import com.example.demo.service.NganhHocProcedureService;
 import com.example.demo.service.NganhHocService;
@@ -43,6 +43,7 @@ public class NganhHocRestController {
      *           Nếu tạo ngành học thất bại, xảy ra lỗi: trả về lỗi tương ứng
      *
      * */
+    
     @PostMapping("/create")
     public ResponseEntity<?> taoMoiNganhHoc(@Valid @RequestBody NganhHoc nganhHoc)
     {

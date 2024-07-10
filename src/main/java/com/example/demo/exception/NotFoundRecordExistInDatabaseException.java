@@ -1,4 +1,4 @@
-package com.example.demo.exceptioncustom;
+package com.example.demo.exception;
 
 /*
  * Người tạo : Hoan
@@ -6,6 +6,7 @@ package com.example.demo.exceptioncustom;
  *              để bắt lỗi không tìm thấy bản ghi nào trong database
  *
  * */
+
 public class NotFoundRecordExistInDatabaseException extends RuntimeException{
     public NotFoundRecordExistInDatabaseException(String message){
         super(message);
