@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.dto.NganhHocDto;
+import com.example.demo.dto.NganhHocDto;
 import com.example.demo.entity.SinhVien;
-import com.example.demo.entity.dto.SinhvienDto;
+import com.example.demo.dto.SinhvienDto;
 import com.example.demo.service.SinhVienService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,6 +57,7 @@ public class SinhVienController {
             }
             return new ResponseEntity<>(list,HttpStatus.OK);
     }
+
 
     /**
      * api trả về sinh viên theo id sinh viên

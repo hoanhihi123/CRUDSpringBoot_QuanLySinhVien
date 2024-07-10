@@ -8,8 +8,4 @@ package com.example.demo.util;
 public class Constant {
     // biến NUMBER_PAGE : là biến chỉ số lượng bản ghi hiển thị trên 1 trang
     public static final int NUMBER_PAGE = 2;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531

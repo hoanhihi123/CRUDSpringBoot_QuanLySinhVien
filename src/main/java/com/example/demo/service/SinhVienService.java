@@ -1,35 +1,10 @@
 package com.example.demo.service;
 
-<<<<<<< HEAD
-import com.example.demo.repository.ISinhVienRepositoryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-/*
- * Người tạo : Hoan
- * Mục đích  : Xử lý nghiệp vụ liên quan tới đối tượng SinhVien
- *
- * */
-@Service
-public class SinhVienService {
-    @Autowired
-    ISinhVienRepositoryImpl repo_sinhVien;
-
-    //
-    /*
-     * Mục đích: đếm số lượng id ngành học có trong bảng sinh viên
-     * Input   : tham số id ngành học
-     * Output  : tổng số lượng id ngành học đếm được trong bảng sinh viên
-     *
-     * */
-    public int checkExistIdNganhHocIntableSinhVien(Integer idNganhHoc){
-        return repo_sinhVien.checkExistsNganhHocInTableSinhVien(idNganhHoc);
-=======
-
+import com.example.demo.dto.NganhHocDto;
+import com.example.demo.dto.SinhvienDto;
 import com.example.demo.entity.NganhHoc;
-import com.example.demo.entity.dto.NganhHocDto;
 import com.example.demo.entity.SinhVien;
-import com.example.demo.entity.dto.SinhvienDto;
 import com.example.demo.repository.INganhHocRepository;
 import com.example.demo.repository.IProcedureRepository;
 
@@ -60,7 +35,6 @@ public class SinhVienService {
      */
     public List<SinhVien> getListSinhVien() {
         return iSinhVienRepository.findAll();
->>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531
     }
 
     /**

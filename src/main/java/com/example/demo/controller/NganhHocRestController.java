@@ -1,16 +1,19 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.NganhHocDto;
+import com.example.demo.dto.NganhHocRequestDTO;
+import com.example.demo.entity.NganhHoc;
 import com.example.demo.exceptioncustom.DuplicateValueException;
 import com.example.demo.exceptioncustom.NotFoundRecordExistInDatabaseException;
-<<<<<<< HEAD
-import com.example.demo.model.NganhHoc;
-=======
-import com.example.demo.entity.NganhHoc;
->>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531
+import com.example.demo.response.ResponseObject;
 import com.example.demo.service.NganhHocProcedureService;
 import com.example.demo.service.NganhHocService;
 import com.example.demo.service.SinhVienService;
 import com.example.demo.util.Constant;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +35,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/nganhHoc")
 public class NganhHocRestController {
+
     @Autowired
     NganhHocService nganhHocService;
 
@@ -47,33 +52,45 @@ public class NganhHocRestController {
      *           Nếu tạo ngành học thất bại, xảy ra lỗi: trả về lỗi tương ứng
      *
      * */
+    @Operation(summary = "Tạo mới ngành học"
+            , description = "Endpoint này trả về ngành học mới được tạo thành công"
+            , tags = {"Ngành Học"}
+            , responses = {
+            @ApiResponse(responseCode = "400", description = "BAD_REQUEST - Yêu cầu HTTP không có nội dung hoặc dữ liệu chưa phù hợp với quy định validate"),
+            @ApiResponse(responseCode = "409", description = "CONFLICT - Dữ liệu chuyển từ JSON sang Java không hợp lệ hoặc Dữ liệu trùng lặp"),
+            @ApiResponse(responseCode = "201", description = "CREATED - tạo mới thành công"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
+    })
     @PostMapping("/create")
-    public ResponseEntity<?> taoMoiNganhHoc(@Valid @RequestBody NganhHoc nganhHoc)
+    public ResponseEntity<ResponseObject> taoMoiNganhHoc(
+            @Valid @RequestBody NganhHocRequestDTO nganhHocRequest
+    )
     {
-        try{
-            if(nganhHoc==null){
-                throw new NullPointerException("Ngành học đang chứa giá trị null!");
+            if(nganhHocRequest==null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        ResponseObject.builder()
+                                .message("Object ngành học chứa giá trị null không hợp lệ!")
+                                .status(HttpStatus.BAD_REQUEST)
+                                .build());
             }
 
-            if(nganhHocService.demSoLuongNganhHoc_theoMaNganhHoc(nganhHoc.getMaNganh())>0){
-                throw new DuplicateValueException("Mã ngành học " + nganhHoc.getMaNganh() + " đã tồn tại trong database!\nVui lòng nhập mã ngành khác");
+            if(nganhHocService.demSoLuongNganhHoc_theoMaNganhHoc(nganhHocRequest.getMaNganh())>0){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                        ResponseObject.builder()
+                                .message("Mã ngành học bị trùng lặp! \nVui lòng nhập mã ngành học khác!")
+                                .status(HttpStatus.CONFLICT)
+                                .object(null)
+                                .build());
             }
-            NganhHoc newNganhHoc = nganhHocService.taoMoiNganhHoc(nganhHoc);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newNganhHoc);
 
-        }catch (HttpMessageNotReadableException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (NullPointerException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (DuplicateValueException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi TẠO ngành học!\nNguyên nhân do:"+ex.getMessage());
-        }
+            NganhHoc newNganhHoc = nganhHocService.taoMoiNganhHoc(nganhHocRequest);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    ResponseObject.builder()
+                            .message("Tạo ngành học mới thành công")
+                            .status(HttpStatus.CREATED)
+                            .object(newNganhHoc).build()
+            );
     }
 
     /*
@@ -83,30 +100,37 @@ public class NganhHocRestController {
      *           trả về thông báo lỗi nếu xảy ra lỗi trong quá trình chạy hệ thống
      *
      * */
+    @Operation(summary = "Lấy danh sách ngành học theo số trang muốn xem"
+            , description = "Endpoint này trả về danh sách ngành học với số trang tương ứng"
+            , tags = {"Ngành Học"}
+            , responses = {
+            @ApiResponse(responseCode = "200", description = "OK - lấy dữ liệu thành công hoặc không có dữ liệu để trả về"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
+    })
     @GetMapping("/getall")
-    public ResponseEntity<?> layDanhSachNganhHoc(
+    public ResponseEntity<ResponseObject> layDanhSachNganhHoc(
             @RequestParam(name = "page", defaultValue = "0") int currentPage
     ){
         Pageable pageable = PageRequest.of(currentPage, Constant.NUMBER_PAGE);
         List<NganhHoc> listNganhHoc = nganhHocService.layDanhSachNganhHocVaPhanTrang(pageable).getContent();
-
-        try{
-            if(listNganhHoc.size()==0){
-                return ResponseEntity.ok("Không có bản ghi nào trong Database!");
-            }
-
-            return ResponseEntity.ok(listNganhHoc);
-
-        }catch (NullPointerException exception){
-            exception.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Danh sách ngành học null!");
-        }catch (Exception exception){
-            exception.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình XEM danh sách ngành học!\nNguyên nhân do:"+exception.getMessage());
+        if(listNganhHoc.size()==0){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResponseObject.builder()
+                            .message("Không có bản ghi Ngành Học nào trong trang hiện tại")
+                            .status(HttpStatus.OK)
+                            .build());
         }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseObject.builder()
+                        .message("Lấy danh sách ngành học thành công tại trang hiện tại")
+                        .status(HttpStatus.OK)
+                        .object(listNganhHoc)
+                        .build());
+
     }
 
-    //
+
     /*
      * Mục đích: api xóa ngành học theo id
      * Input   : truyền vào tham số id ngành học
@@ -114,39 +138,53 @@ public class NganhHocRestController {
      *           hiển thị lỗi tương ứng trong quá trình thực hiện api xóa ngành học
      *
      * */
+    @Operation(summary = "Xóa ngành học theo id"
+            , description = "Endpoint này trả về thông báo thành công xóa ngành học nếu xóa thành công"
+            , tags = {"Ngành Học"}
+            , responses = {
+            @ApiResponse(responseCode = "200", description = "OK - lấy dữ liệu thành công hoặc không có dữ liệu để trả về"),
+            @ApiResponse(responseCode = "204", description = "NO_CONTENT - không có dữ liệu phù hợp để trả về từ Server"),
+            @ApiResponse(responseCode = "400", description = "BAD_REQUEST - Yêu cầu HTTP không có nội dung hoặc dữ liệu chưa " +
+                    "                                           phù hợp với quy định validate"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
+    })
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> xoaNganhHocTheoId(
+    public ResponseEntity<ResponseObject> xoaNganhHocTheoId(
             @PathVariable Integer id
     ) {
-        try{
-            if(id==null){
-                throw new NullPointerException("Giá trị id truyền từ URL is null!");
-            }
-
-            if(sinhVienService.checkExistIdNganhHocIntableSinhVien(id)>0){
-                nganhHocService.xoaMemNganhHoc_theoId(id);
-                return ResponseEntity.ok("Ngành học bạn muốn xóa có trong bảng sinh viên\nHệ thống đã xóa mềm ngành học giúp bạn!");
-            }else {
-                Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
-                if(!nganhHocOptional.isPresent()){
-                    throw new NotFoundRecordExistInDatabaseException("Không có bản ghi nào tương ứng với id = " + id + "!");
-                }
-
-                nganhHocService.xoaNganhHocBangId(id);
-                return ResponseEntity.ok("Xóa Ngành Học thành công khỏi database!");
-            }
-
-        }catch (NullPointerException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (NotFoundRecordExistInDatabaseException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi XÓA ngành học!Nguyên nhân: " + ex.getMessage());
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ResponseObject.builder()
+                            .message("Giá trị id truyền từ URL is null!")
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build());
         }
 
+        if (sinhVienService.checkExistIdNganhHocIntableSinhVien(id) > 0) {
+            nganhHocService.xoaMemNganhHoc_theoId(id);
+
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResponseObject.builder()
+                            .message("Ngành học bạn muốn xóa có trong bảng sinh viên\nHệ thống đã xóa mềm ngành học giúp bạn!")
+                            .status(HttpStatus.OK)
+                            .build());
+        } else {
+            Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
+            if (!nganhHocOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                        ResponseObject.builder()
+                                .message("Xóa Ngành Học thành công khỏi database!")
+                                .status(HttpStatus.NO_CONTENT)
+                                .build());
+            }
+
+            nganhHocService.xoaNganhHocBangId(id);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResponseObject.builder()
+                            .message("Xóa Ngành Học thành công khỏi database!")
+                            .status(HttpStatus.OK)
+                            .build());
+        }
     }
 
     /*
@@ -156,58 +194,71 @@ public class NganhHocRestController {
      *           hiển thị lỗi tương ứng trong quá trình thực hiện api cập nhật
      *
      * */
+    @Operation(summary = "Cập nhật thông tin ngành học"
+            , description = "Endpoint này trả về thông tin mới được cập nhật của ngành học"
+            , tags = {"Ngành Học"}
+            , responses = {
+            @ApiResponse(responseCode = "200", description = "OK - Cập nhật dữ liệu thành công"),
+            @ApiResponse(responseCode = "204", description = "NO_CONTENT - Không có dữ liệu trả về từ Server"),
+            @ApiResponse(responseCode = "400", description = "BAD_REQUEST - Yêu cầu HTTP không có nội dung hoặc dữ liệu chưa phù hợp với quy định validate"),
+            @ApiResponse(responseCode = "409", description = "CONFLICT - Dữ liệu chuyển từ JSON sang Java không hợp lệ hoặc Dữ liệu trùng lặp"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
+    })
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> capNhatNganhHoc(
+    public ResponseEntity<ResponseObject> capNhatNganhHoc(
             @PathVariable Integer id,
-            @Valid @RequestBody NganhHoc nganhHoc
+            @Valid @RequestBody NganhHocRequestDTO nganhHocRequest
     ) {
-        try{
-            if(id==null){
-                throw new NullPointerException("Giá trị id truyền từ url is null!");
-            }
-
-            if(nganhHoc==null){
-                throw new NullPointerException("Giá trị Object Ngành Học nhận request từ Client is null!");
-            }
-
-            // check ngành học có tồn tại bản ghi ko?
-            Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
-            if(!nganhHocOptional.isPresent()){
-                throw new NotFoundRecordExistInDatabaseException("Không có bản ghi nào tương ứng với id = " + id + "!");
-            }
-
-            // check trùng mã không ?
-            if(nganhHocService.demSoLuongNganhHoc_theoMaNganhHoc(nganhHoc.getMaNganh())>0){
-                throw new DuplicateValueException("Mã ngành học " + nganhHoc.getMaNganh() + " đã tồn tại trong database!\nVui lòng nhập mã ngành khác");
-            }
-
-            NganhHoc nganhHocUpdate = nganhHocOptional.get();
-            nganhHocUpdate.setMaNganh(nganhHoc.getMaNganh());
-            nganhHocUpdate.setTenNganh(nganhHoc.getTenNganh());
-            if(nganhHoc.getIsDeleted()!=null){
-                nganhHocUpdate.setIsDeleted(nganhHoc.getIsDeleted());
-            }
-            return ResponseEntity.ok(nganhHocService.capNhatNganhHoc(nganhHocUpdate));
-
-        }catch (HttpMessageNotReadableException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (NullPointerException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (NotFoundRecordExistInDatabaseException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }catch (DuplicateValueException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi SỬA ngành học!\nNguyên nhân do:"+ex.getMessage());
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ResponseObject.builder()
+                            .message("Giá trị id truyền từ URL is null!")
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build());
         }
+
+        if(nganhHocRequest==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ResponseObject.builder()
+                            .message("Giá trị Object Ngành Học nhận request từ Client is null!")
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build());
+        }
+
+        // check ngành học có tồn tại bản ghi ko?
+        Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
+        if(!nganhHocOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                    ResponseObject.builder()
+                            .message("Không có bản ghi nào tương ứng với id = " + id + "!")
+                            .status(HttpStatus.NO_CONTENT)
+                            .build());
+        }
+
+        // check trùng mã không ?
+        if(nganhHocService.demSoLuongNganhHoc_theoMaNganhHoc(nganhHocRequest.getMaNganh())>0){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    ResponseObject.builder()
+                            .message("Mã ngành học " + nganhHocRequest.getMaNganh() + " đã tồn tại trong database!\nVui lòng nhập mã ngành khác")
+                            .status(HttpStatus.CONFLICT)
+                            .build());
+        }
+
+        NganhHoc nganhHocUpdate = nganhHocOptional.get();
+        nganhHocUpdate.setMaNganh(nganhHocRequest.getMaNganh());
+        nganhHocUpdate.setTenNganh(nganhHocRequest.getTenNganh());
+        if(nganhHocRequest.getIsDeleted()!=null) {
+            nganhHocUpdate.setIsDeleted(nganhHocRequest.getIsDeleted());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseObject.builder()
+                        .message("Cập nhật thông tin ngành học thành công")
+                        .status(HttpStatus.OK)
+                        .object(nganhHocService.capNhatNganhHoc(nganhHocUpdate))
+                        .build());
     }
 
-    // lấy chi tiết ngành học theo id
     /*
      * Mục đích: lấy chi tiết ngành học theo id
      * Input   : id ngành học
@@ -215,30 +266,45 @@ public class NganhHocRestController {
      *
      *
      * */
+    @Operation(summary = "Xem chi tiết ngành học", description = "Endpoint này trả về thông tin chi tiết ngành học theo id"
+            , tags = {"Ngành Học"}
+            , responses = {
+            @ApiResponse(responseCode = "200", description = "OK - Xem chi tiết ngành học theo id truyền vào thành công"),
+            @ApiResponse(responseCode = "204", description = "NO_CONTENT - Không có dữ liệu trả về từ Server"),
+            @ApiResponse(responseCode = "400", description = "BAD_REQUEST - Yêu cầu HTTP không có nội dung hoặc dữ liệu chưa phù hợp với quy định validate"),
+            @ApiResponse(responseCode = "409", description = "CONFLICT - Dữ liệu chuyển từ JSON sang Java không hợp lệ hoặc Dữ liệu trùng lặp"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
+    })
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> xemChiTietNganhHocTheoId(
             @PathVariable Integer id
     ){
-        try{
-            if(id==null){
-                throw new NullPointerException("Giá trị id truyền từ URL is null!");
-            }
-
-            // check ngành học có tồn tại bản ghi ko?
-            Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
-            if(!nganhHocOptional.isPresent()){
-                throw new NotFoundRecordExistInDatabaseException("Không có bản ghi nào tương ứng với id = " + id + "!");
-            }
-
-            return ResponseEntity.ok(nganhHocOptional.get());
-
-        }catch (NullPointerException ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi XEM CHI TIẾT ngành học!\nNguyên nhân do:"+ex.getMessage());
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ResponseObject.builder()
+                            .message("Giá trị id truyền từ URL is null!")
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build());
         }
+
+        // check ngành học có tồn tại bản ghi ko?
+        Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
+        if(!nganhHocOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                    ResponseObject.builder()
+                            .message("Không có bản ghi nào tương ứng với id = " + id + "!")
+                            .status(HttpStatus.NO_CONTENT)
+                            .build());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseObject.builder()
+                        .message("Xem dữ liệu ngành học chi tiết thành công")
+                        .status(HttpStatus.OK)
+                        .object(nganhHocOptional.get())
+                        .build());
+
+
     }
 
     /*
@@ -248,27 +314,34 @@ public class NganhHocRestController {
      *           + hiển thị lỗi nếu trong quá trình runtime xảy ra lỗi tương ứng
      *
      * */
+    @Operation(summary = "Lấy danh sách tất cả ngành học bằng procedure"
+            , description = "Endpoint này trả về danh sách tất cả ngành học"
+            , tags = {"Ngành Học"}
+            , responses = {
+            @ApiResponse(responseCode = "200", description = "OK - lấy dữ liệu thành công hoặc không có dữ liệu để trả về"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
+    })
     @GetMapping("/getList")
     public ResponseEntity<?> layDanhSachNganhHoc_procedure(){
+
         List<NganhHoc> listNganhHoc = nganhHocProcedureService.layDanhSachNganhHoc();
 
-        try{
-            if(listNganhHoc.size()==0){
-                return ResponseEntity.ok("Không có bản ghi nào trong Database!");
-            }
-            return ResponseEntity.ok(listNganhHoc);
-
-        }catch (NullPointerException exception){
-            exception.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Danh sách ngành học null!");
-        }catch (Exception exception){
-            exception.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình XEM danh sách ngành học!\nNguyên nhân do:"+exception.getMessage());
+        if(listNganhHoc.size()==0){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResponseObject.builder()
+                            .message("Không có bản ghi Ngành Học nào trong Database")
+                            .status(HttpStatus.OK)
+                            .build());
         }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseObject.builder()
+                        .message("Lấy danh sách tất cả ngành học thành công")
+                        .status(HttpStatus.OK)
+                        .object(listNganhHoc)
+                        .build());
     }
 
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531
+

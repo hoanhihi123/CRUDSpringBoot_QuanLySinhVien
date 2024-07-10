@@ -1,12 +1,7 @@
 package com.example.demo.service;
 
-<<<<<<< HEAD
-import com.example.demo.model.NganhHoc;
-import com.example.demo.repository.INganhHocRepositoryImpl;
-=======
 import com.example.demo.entity.NganhHoc;
 import com.example.demo.repository.INganhHocRepository;
->>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +15,7 @@ import java.util.List;
 @Service
 public class NganhHocProcedureService {
     @Autowired
-    INganhHocRepositoryImpl repo_nganhHoc;
+    INganhHocRepository repo_nganhHoc;
 
     /*
      * Mục đích: lấy danh sách ngành học bằng việc execute procedure

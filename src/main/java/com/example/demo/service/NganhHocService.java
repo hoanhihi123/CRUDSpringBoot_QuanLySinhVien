@@ -1,12 +1,8 @@
 package com.example.demo.service;
 
-<<<<<<< HEAD
-import com.example.demo.model.NganhHoc;
-import com.example.demo.repository.INganhHocRepositoryImpl;
-=======
+import com.example.demo.dto.NganhHocRequestDTO;
 import com.example.demo.entity.NganhHoc;
 import com.example.demo.repository.INganhHocRepository;
->>>>>>> d60cff16f6f1bca26d1d1303c8844682d8c16531
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -23,9 +19,9 @@ import java.util.Optional;
 @Service
 public class NganhHocService {
     @Autowired
-    private final INganhHocRepositoryImpl repo_nganhHoc;
+    private final INganhHocRepository repo_nganhHoc;
 
-    public NganhHocService(INganhHocRepositoryImpl repo_nganhHoc){
+    public NganhHocService(INganhHocRepository repo_nganhHoc){
         this.repo_nganhHoc = repo_nganhHoc;
     }
 
@@ -68,7 +64,7 @@ public class NganhHocService {
      *           hoặc trả về lỗi nếu xảy ra lỗi trong quá trình Runtime
      *
      * */
-    public NganhHoc taoMoiNganhHoc(NganhHoc nganhHoc){
+    public NganhHoc taoMoiNganhHoc(NganhHocRequestDTO nganhHoc){
         try{
             NganhHoc nganhHocNew = new NganhHoc();
             nganhHocNew.setMaNganh(nganhHoc.getMaNganh());
@@ -91,11 +87,9 @@ public class NganhHocService {
      * */
     public Optional<NganhHoc> capNhatNganhHoc(NganhHoc nganhHoc) {
         try {
-
             NganhHoc nganhHocUpdated = repo_nganhHoc.save(nganhHoc);
 
             return Optional.of(nganhHocUpdated);
-
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException("Failed to update Nganh Hoc! \nCause is: " + ex.getMessage());

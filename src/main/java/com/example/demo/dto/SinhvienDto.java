@@ -1,6 +1,5 @@
-package com.example.demo.entity.dto;
+package com.example.demo.dto;
 
-import com.example.demo.entity.NganhHoc;
 import lombok.Data;
 
 @Data
