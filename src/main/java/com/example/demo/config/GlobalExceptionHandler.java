@@ -64,7 +64,8 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-//        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+
+        logger.error("Exception occurred: {}, Request Details: {}",ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
             ResponseObject.builder()
                     .status(HttpStatus.BAD_REQUEST)
@@ -85,6 +86,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ResponseObject> handleHTTPMessageNotReadableException(HttpMessageNotReadableException ex){
         if(ex.getCause() instanceof InvalidFormatException){
+
+            logger.error("Exception occurred: {}, Request Details: {}",ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     ResponseObject.builder()
                             .message("Chuyển đổi kiểu dữ liệu từ JSON sang Java không hợp lệ!")
@@ -93,10 +96,29 @@ public class GlobalExceptionHandler {
             );
         }
 
+        logger.error("Exception occurred: {}, Request Details: {}",ex.getMessage(), ex);
         return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 ResponseObject.builder()
                         .message("Payload tại postman trống dữ liệu truyền vào!")
                         .status(HttpStatus.BAD_REQUEST)  // 400: bad request
+                        .build());
+    }
+
+    // for check duplicate field value
+    @ExceptionHandler(DuplicateValueException.class)
+    public ResponseEntity<ResponseObject> handleDuplicateCodeException(DuplicateValueException ex){
+        return  ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ResponseObject.builder()
+                        .status(HttpStatus.CONFLICT)
+                        .build());
+    }
+
+    // for check exist in DB
+    @ExceptionHandler(NotFoundRecordExistInDatabaseException.class)
+    public ResponseEntity<ResponseObject> handleNotRecordExistInDatabaseException(NotFoundRecordExistInDatabaseException ex){
+       return  ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                ResponseObject.builder()
+                        .status(HttpStatus.NO_CONTENT)
                         .build());
     }
 }

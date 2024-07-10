@@ -3,8 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.dto.NganhHocDto;
 import com.example.demo.dto.NganhHocRequestDTO;
 import com.example.demo.entity.NganhHoc;
-import com.example.demo.exceptioncustom.DuplicateValueException;
-import com.example.demo.exceptioncustom.NotFoundRecordExistInDatabaseException;
 import com.example.demo.response.ResponseObject;
 import com.example.demo.service.NganhHocProcedureService;
 import com.example.demo.service.NganhHocService;
@@ -20,8 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -227,7 +223,7 @@ public class NganhHocRestController {
 
         // check ngành học có tồn tại bản ghi ko?
         Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
-        if(!nganhHocOptional.isPresent()){
+        if(nganhHocOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
                     ResponseObject.builder()
                             .message("Không có bản ghi nào tương ứng với id = " + id + "!")
@@ -264,7 +260,6 @@ public class NganhHocRestController {
      * Input   : id ngành học
      * Output  : hiển thị thông tin của Object ngành học tương ứng với id truyền vào với trạng thái 200
      *
-     *
      * */
     @Operation(summary = "Xem chi tiết ngành học", description = "Endpoint này trả về thông tin chi tiết ngành học theo id"
             , tags = {"Ngành Học"}
@@ -276,7 +271,7 @@ public class NganhHocRestController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
     })
     @GetMapping("/detail/{id}")
-    public ResponseEntity<?> xemChiTietNganhHocTheoId(
+    public ResponseEntity<ResponseObject> xemChiTietNganhHocTheoId(
             @PathVariable Integer id
     ){
         if(id==null){
@@ -289,7 +284,7 @@ public class NganhHocRestController {
 
         // check ngành học có tồn tại bản ghi ko?
         Optional<NganhHoc> nganhHocOptional = nganhHocService.layNganhHoc_theoId(id);
-        if(!nganhHocOptional.isPresent()){
+        if(nganhHocOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
                     ResponseObject.builder()
                             .message("Không có bản ghi nào tương ứng với id = " + id + "!")
@@ -322,7 +317,7 @@ public class NganhHocRestController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error - Server gặp phải lỗi không mong muốn")
     })
     @GetMapping("/getList")
-    public ResponseEntity<?> layDanhSachNganhHoc_procedure(){
+    public ResponseEntity<ResponseObject> layDanhSachNganhHoc_procedure(){
 
         List<NganhHoc> listNganhHoc = nganhHocProcedureService.layDanhSachNganhHoc();
 
